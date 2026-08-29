@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://blox4dead/schema/b4d-campaign-1.json",
+  "title": "Blox 4 Dead campaign",
+  "description": "One playable campaign map. Coordinates are game metres on the X/Z ground plane with Y up. Zones are axis-aligned boxes; two zones that overlap by more than 1.5m are connected, and that overlap is the doorway. Navigation, spawning and the interior architecture pass are all derived from the zone list, so drawing zones is the core of authoring a map.",
+  "type": "object",
+  "required": ["schema", "id", "index", "theme", "zones"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "Stable key, e.g. blood_meal." },
+    "index": { "type": "integer", "minimum": 0, "maximum": 4, "description": "Campaign slot the map occupies." },
+    "theme": { "type": "string", "description": "Key into CAMPAIGN_THEMES. Supplies the material palette, ambient light and wall settings." },
+    "extraction": { "type": "string", "enum": ["cattleTruck"], "description": "Vehicle waiting at the end of the map." },
+    "quirkyProps": { "type": "boolean", "default": true, "description": "Scatter the shared incidental set dressing." },
+    "platforms": { "type": "array", "items": { "type": "object" }, "default": [] },
+
+    "zones": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "x", "z", "halfX", "halfZ", "floor"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "description": "Unique within the map." },
+          "x": { "type": "number" }, "z": { "type": "number" },
+          "halfX": { "type": "number", "exclusiveMinimum": 0 },
+          "halfZ": { "type": "number", "exclusiveMinimum": 0 },
+          "floor": { "type": "string", "description": "Theme material name." },
+          "roof": { "type": "number", "description": "Ceiling height in metres. Omit for an open-air zone." },
+          "roofMaterial": { "type": "string" },
+          "lampY": { "type": "number", "description": "Height of the flickering ceiling lamps. Omit for no lamps." },
+          "lampCols": { "type": "integer", "minimum": 1, "description": "Defaults to 2 when halfX > 20, else 1." },
+          "lampMaterial": { "type": "string", "default": "steel" },
+          "walls": { "type": "boolean", "default": true, "description": "false leaves the zone open, for outdoor yards." }
+        }
+      }
+    },
+
+    "props": {
+      "type": "array",
+      "description": "Set dressing. `at` places one spec at many spots as [x, z] or [x, z, rotY].",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string", "enum": ["box", "cylinder", "grid", "chainLine", "carcassRows", "lightPole", "vat", "pipeRun"] },
+          "at": { "type": "array", "items": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 3 } },
+          "material": { "type": "string" },
+          "collide": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "[halfX, halfZ] of the blocking box. Omit for a non-solid prop." },
+          "kind": { "type": "string", "description": "Collider label, shown in debug views." },
+          "shadow": { "type": "boolean", "default": false }
+        }
+      }
+    },
+
+    "hazards": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "barrels": {
+          "type": "array",
+          "items": {
+            "type": "object", "required": ["x", "z"], "additionalProperties": false,
+            "properties": { "x": { "type": "number" }, "z": { "type": "number" }, "color": { "type": "integer" } }
+          }
+        },
+        "drops": {
+          "type": "array",
+          "description": "A heavy load on a cable. Shoot either and it falls.",
+          "items": {
+            "type": "object", "required": ["x", "z", "y"], "additionalProperties": false,
+            "properties": {
+              "x": { "type": "number" }, "z": { "type": "number" },
+              "y": { "type": "number", "description": "Resting height of the load." },
+              "anchorY": { "type": "number", "description": "Where the cable is fixed. Defaults to y + 9." },
+              "width": { "type": "number", "default": 12 }, "depth": { "type": "number", "default": 5.6 }, "height": { "type": "number", "default": 2.9 },
+              "color": { "type": "integer" }, "damage": { "type": "number", "default": 900 }, "radius": { "type": "number", "default": 7 },
+              "label": { "type": "string", "default": "DO NOT STAND UNDER" }
+            }
+          }
+        }
+      }
+    },
+
+    "gates": {
+      "type": "array",
+      "description": "Checkpoint doors, one per chapter, in chapter order.",
+      "items": {
+        "type": "object", "required": ["width", "x"], "additionalProperties": false,
+        "properties": { "width": { "type": "number" }, "x": { "type": "number" } }
+      }
+    },
+
+    "objectives": {
+      "type": "array",
+      "description": "One per chapter. The squad must run this device, which draws a sustained attack, before the chapter gate opens.",
+      "items": {
+        "type": "object",
+        "required": ["chapter", "x", "z", "label", "verb", "kind", "type", "duration"],
+        "additionalProperties": false,
+        "properties": {
+          "chapter": { "type": "integer", "minimum": 1 },
+          "x": { "type": "number" }, "z": { "type": "number" },
+          "label": { "type": "string", "description": "Shown as the squad's current order." },
+          "verb": { "type": "string", "description": "Short sign text on the device itself." },
+          "kind": { "type": "string", "description": "Flavour key used for barks and set dressing." },
+          "type": { "type": "string", "enum": ["signal", "breakers", "fuel", "triangulate", "escort"] },
+          "duration": { "type": "number", "description": "Seconds of work once started." },
+          "window": { "type": "number", "description": "breakers only: seconds all switches must be held live together." },
+          "cartTo": {
+            "type": "object", "required": ["x", "z"], "additionalProperties": false,
+            "description": "escort only: where the cart must arrive.",
+            "properties": { "x": { "type": "number" }, "z": { "type": "number" } }
+          },
+          "nodes": {
+            "type": "array",
+            "description": "Secondary stations, offset from the device.",
+            "items": {
+              "type": "object", "required": ["dx", "dz", "label"], "additionalProperties": false,
+              "properties": { "dx": { "type": "number" }, "dz": { "type": "number" }, "label": { "type": "string" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

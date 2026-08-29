@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "example_depot",
+  "index": 2,
+  "theme": "slaughterhouse",
+  "extraction": "cattleTruck",
+  "zones": [
+    { "name": "yard", "x": 0, "z": 60, "halfX": 40, "halfZ": 30, "floor": "blood", "walls": false },
+    { "name": "corridor", "x": 0, "z": 25, "halfX": 8, "halfZ": 14, "floor": "tile", "roof": 5.5, "lampY": 5 },
+    { "name": "depot", "x": 0, "z": -12, "halfX": 30, "halfZ": 26, "floor": "tile", "roof": 9, "lampY": 8.4 }
+  ],
+  "props": [
+    { "type": "lightPole", "at": [[-30, 70], [30, 70]], "h": 13, "lightY": 12, "material": "steel" },
+    { "type": "box", "at": [[10, -20], [16, -20], [-16, -4]], "w": 5, "h": 3, "d": 3.4, "y": 1.5,
+      "material": "rust", "shadow": true, "collide": [2.8, 1.9], "kind": "crate" },
+    { "type": "vat", "x": -12, "z": -26, "rTop": 4.2, "rBottom": 4.6, "h": 4, "material": "rust" }
+  ],
+  "hazards": {
+    "barrels": [{ "x": -12, "z": -20 }, { "x": 6, "z": 22 }]
+  },
+  "gates": [{ "width": 12, "x": 0 }],
+  "objectives": [
+    { "chapter": 1, "x": 0, "z": -12, "label": "RESTART THE DEPOT PUMPS", "verb": "PUMPS",
+      "kind": "pumps", "type": "signal", "duration": 20 }
+  ]
+}

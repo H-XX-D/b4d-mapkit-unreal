@@ -1,0 +1,20 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0.0",
+  "FriendlyName": "Blox 4 Dead Map Kit",
+  "Description": "Author Blox 4 Dead campaign maps in the Unreal level editor and export them as campaign JSON the game loads directly.",
+  "Category": "Level Design",
+  "CreatedBy": "Blox 4 Dead",
+  "EnabledByDefault": true,
+  "CanContainContent": false,
+  "IsBetaVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "B4DMapKit",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
