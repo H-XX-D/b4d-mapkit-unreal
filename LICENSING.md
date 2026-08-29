@@ -54,6 +54,59 @@ So before baking a purchased asset into a shipped map:
 3. If it is silent, ask the publisher. Most answer.
 4. If you cannot get an answer, do not ship it.
 
+## Shipping inside a Discord Activity
+
+This matters, and it moves the answer, so it is worth being precise about what
+it does and does not change.
+
+**What it changes.** A Discord Activity is served to the Discord client from
+your own server. Players open a game, not a web page: there is no address bar,
+no view source, and nothing in a search index. Casual exposure is close to zero,
+which is a real difference from a public web build sitting on an open URL.
+
+**What it does not change.** It is still a web page underneath. The Discord
+desktop client can open developer tools, and the activity is reachable over
+HTTPS. Someone determined can still pull what the page loaded. Being behind
+Discord lowers practical exposure; it does not create a licence exception.
+
+**Why that is usually fine anyway.** The Asset Store EULA permits incorporating
+an asset into an interactive product. The clause people worry about is aimed at
+distributing the asset *as an asset*, in a form someone can take and use in
+their own work. A mesh baked to glTF, stripped of its names, optimised for one
+game and embedded in that game's page is on the incorporated-into-a-product side
+of that line by any ordinary reading. This is the same posture as every
+commercial WebGL game shipping bought art.
+
+The residual risk is narrow and specific: **packs whose own terms explicitly
+prohibit web or browser builds.** Some say so outright. That is the thing worth
+checking, rather than the general question of whether a browser can technically
+save a file.
+
+### What the kit does to help
+
+| Measure | Effect |
+| --- | --- |
+| Bake to glTF | Ships a game-ready derivative, not the source FBX, and drops everything the game does not use. |
+| Inline as base64 | On by default. The mesh lives inside the page rather than as a `.glb` sitting in the network tab, so there is no file to right click and save. |
+| Strip names | On by default. Mesh, node, material and generator names are removed. Names are the part that identifies which pack a mesh came from. |
+| One base colour map | No normal, roughness or emissive maps are carried, so the full material set never leaves Unity. |
+
+Turn stripping off while you are debugging a bake; leave it on for anything you
+ship.
+
+Your own side of it is server shaped and outside this kit: serving the activity
+only to authenticated Discord sessions, and not leaving the build on a public
+URL, are both worth doing and both live in your backend.
+
+### What I would actually do
+
+1. Ship it. For the overwhelming majority of packs this is licensed use.
+2. Before baking a pack, search its licence page for "web", "WebGL" or
+   "browser". If it forbids them, use reference scenery for that pack instead.
+3. Keep inline and strip names on, which is the default.
+4. If a pack is expensive, central to the look, or the terms read oddly, ask the
+   publisher. Most answer, and a one line yes in your inbox is worth having.
+
 ## The safe path
 
 **Reference scenery exists for exactly this.** Mark art with
@@ -96,5 +149,5 @@ it.
 | Your own art, baked | Yours | Nothing |
 | CC0 art, baked | CC0 | Nothing |
 | CC-BY art, baked | CC-BY | Credit it, check for share-alike |
-| Asset Store art, baked | That pack's EULA | Extraction and web clauses. Check before shipping. |
+| Asset Store art, baked into a Discord Activity | That pack's EULA | Usually licensed use. Check only for an explicit web or WebGL prohibition. |
 | Asset Store art, reference only | That pack's EULA | Nothing, it never leaves Unity |
