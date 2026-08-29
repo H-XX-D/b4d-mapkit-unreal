@@ -8,7 +8,7 @@ Unreal level  ──►  campaign JSON  ──►  playable map
 ```
 
 The Unity edition of the same kit exports the identical format:
-[b4d-mapkit-unity](https://github.com/hendrixx-cnc/b4d-mapkit-unity).
+[b4d-mapkit-unity](https://github.com/H-XX-D/b4d-mapkit-unity).
 
 ## Install
 
@@ -16,7 +16,7 @@ Clone into your project's `Plugins` folder. The repository root is the plugin,
 so it drops straight in:
 
 ```
-git clone https://github.com/hendrixx-cnc/b4d-mapkit-unreal.git Plugins/B4DMapKit
+git clone https://github.com/H-XX-D/b4d-mapkit-unreal.git Plugins/B4DMapKit
 ```
 
 Reopen the project and let the editor build the module. Tested against Unreal
