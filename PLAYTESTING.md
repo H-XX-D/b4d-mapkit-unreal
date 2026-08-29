@@ -1,120 +1,127 @@
-# Getting a map you edited into the game
+# Playtesting a map you built
 
-The game is one HTML file. A map is one JSON file. This is how you get from a
-scene you just edited to walking around it.
+You are running the game as a downloaded HTML file, opened straight from disk.
+No server, no build step. This is how you get a map you just edited into it.
 
 ## The short version
 
-1. Export the map from Unity or Unreal.
-2. Open the game HTML file in a browser.
-3. Open the browser console and run `B4D_LOAD_MAP(<paste the JSON>)`.
-4. It stores the map and reloads. Pick that campaign from the menu and play.
+1. Export the map from Unity.
+2. Open the game's HTML file in a browser.
+3. **Drag the exported `.json` onto the game window.**
 
-Nothing is uploaded. The map lives in that browser's local storage until you
-clear it.
+That is the whole loop. It reloads itself and the map is in.
+
+Nothing is uploaded anywhere. The map is stored in that browser and stays there
+until you clear it, so a refresh keeps it.
+
+---
 
 ## In full
 
 ### 1. Export
 
-**Unity.** Window ▸ Blox 4 Dead ▸ Map Kit ▸ **Export JSON**. It refuses if the
-map has errors, so a file that comes out will load.
-
-**Unreal.** Tools ▸ Blox 4 Dead ▸ **Export Campaign JSON**. Same rule.
+**Window ▸ Blox 4 Dead ▸ Map Kit ▸ Export JSON.** The export refuses to write a
+file if the map has errors, so a file that comes out will load.
 
 ### 2. Pick a slot
 
-`index` in the map decides which campaign it replaces:
+The `index` on the campaign root decides which campaign your map replaces.
 
-| index | Campaign | Data driven |
+| index | Campaign | Can you replace it |
 | --- | --- | --- |
-| 0 | NO MERCY, rail yard | no, hand built |
-| 1 | DEPARTURE, airport | no, hand built |
+| 0 | NO MERCY, rail yard | no, still hand built |
+| 1 | DEPARTURE, airport | no, still hand built |
 | 2 | BLOOD MEAL, slaughterhouse | yes |
-| 3 | DEAD TIDE, harbor | replaceable |
-| 4 | BLACKOUT DETOUR, crosstown | replaceable |
+| 3 | DEAD TIDE, harbor | yes |
+| 4 | BLACKOUT DETOUR, crosstown | yes |
 
-Slots 2, 3 and 4 build from data whenever a map exists for them, so set `index`
-to one of those. Slots 0 and 1 are still hand built and ignore map data.
+Use **2**, **3** or **4**. The menu still shows the original campaign's name, so
+a map in slot 2 is listed as BLOOD MEAL.
 
-Whatever slot you use keeps the built in campaign's name in the menu. A map in
-slot 2 is still listed as BLOOD MEAL.
+### 3. Drop it on the game
 
-### 3. Load it
+Open the HTML file in a browser and drag the `.json` anywhere onto the window.
+An overlay confirms it, the map is checked, and the page reloads with it in.
 
-Open the game, then open the console:
-
-- Safari: Develop ▸ Show JavaScript Console. Enable the Develop menu first in
-  Settings ▸ Advanced.
-- Chrome and Edge: View ▸ Developer ▸ JavaScript Console.
-- Firefox: Tools ▸ Browser Tools ▸ Web Console.
-
-Then either paste the map inline:
-
-```js
-B4D_LOAD_MAP({ "schema": 1, "id": "my_map", "index": 2, ... })
-```
-
-or, easier with a big file, copy the whole JSON to the clipboard and paste it
-between the brackets of:
-
-```js
-B4D_LOAD_MAP(`  `)
-```
-
-Both work; the second avoids the console reformatting a long object.
-
-The map is checked before it is stored. Errors are printed and nothing is saved.
-Warnings are printed and it loads anyway.
+If the map has errors the overlay says so and nothing is stored. The reasons are
+in the browser console.
 
 ### 4. Play it
 
-The page reloads on its own. Start the game and pick the campaign for the slot
-you used.
+Start the game and pick the campaign for the slot you used.
 
-### Console commands
+---
+
+## Editing loop
+
+Leave the game open in one window and Unity in the other.
+
+1. Change something in the scene.
+2. Export over the same file.
+3. Drag it on again.
+
+The new version replaces the old one for that slot.
+
+---
+
+## Console commands
+
+Drag and drop is easier, but these are there when you want them. Open the
+console with:
+
+- **Safari**: Develop ▸ Show JavaScript Console. Turn the Develop menu on first
+  in Settings ▸ Advanced.
+- **Chrome, Edge**: View ▸ Developer ▸ JavaScript Console.
+- **Firefox**: Tools ▸ Browser Tools ▸ Web Console.
 
 | Command | What it does |
 | --- | --- |
-| `B4D_LOAD_MAP(map)` | Checks, stores and loads a map. Reloads the page. |
-| `B4D_LIST_MAPS()` | Shows which maps are stored and which slot each holds. |
+| `B4D_LIST_MAPS()` | Which maps are loaded, and which slot each holds. |
 | `B4D_CLEAR_MAPS()` | Removes them all and puts the built in levels back. |
+| `B4D_LOAD_MAP(map)` | Loads a map from an object or a JSON string. |
 
-### Why it reloads
+`B4D_LOAD_MAP` takes either a pasted object or the text, so this works if you
+would rather paste than drop:
 
-The world is built once when the page starts. Anything set after that is too
-late for that run, so the map is stored first and picked up on the next boot.
-That is also why the map survives a refresh: keep the console open, re-export,
-load again, and you have a quick edit loop.
+```js
+B4D_LOAD_MAP(`  paste the json between these backticks  `)
+```
 
-## Live preview from the editor
+---
 
-Both kits can hand you the whole line ready to paste:
+## Why it reloads
 
-- Unity: **Copy JSON to clipboard for live preview** in the Map Kit window.
-- Unreal: Tools ▸ Blox 4 Dead ▸ **Copy Live Preview Snippet**.
+The world is built once when the page starts, so anything handed to it after
+that is too late for that run. The map is stored first and picked up on the next
+boot. That is also why it survives a refresh.
 
-That copies a `window.B4D_CAMPAIGN_OVERRIDES = ...` assignment, which applies to
-the current page only and is gone on refresh. For an edit loop that survives
-reloading, `B4D_LOAD_MAP` is the one you want.
+---
 
-## Shipping a map for real
+## Shipping a map properly
 
-Local storage is for playtesting. To ship a map, paste its JSON into
-`CAMPAIGN_DATA` in the game's HTML file, keyed by its `id`. It then builds for
-everyone with no console step.
+Storing in the browser is for playtesting. To make a map part of the game for
+everyone, paste its JSON into `CAMPAIGN_DATA` in the game's HTML file, keyed by
+its `id`. It then builds with no drop step.
+
+---
 
 ## When something is wrong
 
-**The campaign looks unchanged.** Check `B4D_LIST_MAPS()` shows your map, and
-that its `index` is 2, 3 or 4. Slots 0 and 1 ignore map data.
+**Nothing changed.** Run `B4D_LIST_MAPS()`. If your map is not listed, the drop
+did not take. If it is listed but the level looks the same, check its `index` is
+2, 3 or 4, since slots 0 and 1 ignore map data.
 
-**The console says the map could not be built.** The game falls back to the
-built in level rather than leaving you with nothing. The error names what broke.
+**The overlay said the map has errors.** The console lists them. The Map Kit
+window in Unity reports the same things, with a Select button per problem.
 
-**A prop is a plain grey box.** Its mesh could not be read. The console says
-which asset and why. Collision is taken from the map data, so the box blocks
+**The console says a map could not be built.** The game falls back to the built
+in level rather than dropping you into nothing. The error names what broke.
+
+**A prop is a plain grey box.** Its mesh could not be read, and the console says
+which and why. Collision comes from the map data either way, so the box blocks
 movement exactly as the real prop would.
 
-**Everything is black.** Look for a bake warning about a material. See the
-licensing and baking notes in the Unity kit's README.
+**Dropping does nothing at all.** Make sure you are dropping onto the game
+window itself and that the file ends in `.json`. Some browsers open a dropped
+file in a new tab if the page has not finished loading, so give it a moment
+first.
