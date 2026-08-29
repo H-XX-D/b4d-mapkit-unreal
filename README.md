@@ -138,6 +138,11 @@ Adding a type means adding a builder in the game, a row to the field table in
 this plugin, and the name to the schema enum. No new class is needed: the
 editor drives its fields off that table.
 
+## Documentation
+
+- [PLAYTESTING.md](PLAYTESTING.md), getting a map you edited into the game.
+- [LICENSING.md](LICENSING.md), what you can ship, and the Asset Store caveat.
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
