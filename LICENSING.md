@@ -9,7 +9,7 @@ edges are so you know what to check.
 ## The kit itself
 
 Everything in these repositories, the Unity package, the Unreal plugin, the
-schema and the tools, is MIT. Use it commercially, modify it, ship it, no
+schema and the tools, is MIT, copyright H-XX-D. Use it commercially, modify it, ship it, no
 attribution needed beyond keeping the licence file.
 
 MIT covers **the code**. It says nothing about anything the code produces from
